@@ -1,39 +1,35 @@
 /* eslint-disable no-unused-vars */
 
 // ====== USER PARAMS
+
 declare type CreateUserParams = {
   clerkId: string;
   email: string;
   username: string;
   firstName: string;
   lastName: string;
-  photo: string;
 };
 
 declare type UpdateUserParams = {
   firstName: string;
   lastName: string;
   username: string;
-  photo: string;
 };
 
 // ====== IMAGE PARAMS
 declare type AddImageParams = {
-  image: {
-    title: string;
-    publicId: string;
-    transformationType: string;
-    width: number;
-    height: number;
-    config: any;
-    secureURL: string;
-    transformationURL: string;
-    aspectRatio: string | undefined;
-    prompt: string | undefined;
-    color: string | undefined;
-  };
-  userId: string;
-  path: string;
+  title: string;
+  publicId: string;
+  transformationType: string;
+  width: number;
+  height: number;
+  config: any;
+  secureURL: string;
+  transformationUrl: string;
+  aspectRatio: string | undefined;
+  prompt: string | undefined;
+  color: string | undefined;
+  profile: string;
 };
 
 declare type UpdateImageParams = {
@@ -120,9 +116,7 @@ declare type SearchParamProps = {
 
 declare type TransformationFormProps = {
   action: "Add" | "Update";
-  userId: string;
   type: TransformationTypeKey;
-  creditBalance: number;
   data?: IImage | null;
   config?: Transformations | null;
 };

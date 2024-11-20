@@ -1,10 +1,14 @@
-"use server";
-
 import { revalidatePath } from "next/cache";
 
 import User from "../database/models/user.model";
 import { connectToDatabase } from "../database/mongoose";
 import { handleError } from "../utils";
+import apolloClient from "../apolloClient";
+import { GET_ME } from "@/graphql/queries/me";
+import { MeData } from "@/types/auth.types";
+import { setUserInfo } from "@/utils/auth";
+import { toast } from "sonner";
+import { UpdateUserBalance } from "@/graphql/mutation/user";
 
 // CREATE
 export async function createUser(user: CreateUserParams) {
@@ -20,17 +24,20 @@ export async function createUser(user: CreateUserParams) {
 }
 
 // READ
-export async function getUserById(userId: string) {
+export async function getUserById(email: string, token: string) {
   try {
-    await connectToDatabase();
-
-    const user = await User.findOne({ clerkId: userId });
-
-    if (!user) throw new Error("User not found");
-
-    return JSON.parse(JSON.stringify(user));
+    let response = await apolloClient.query({
+      query: GET_ME,
+      fetchPolicy: "network-only",
+      variables: {
+        email: email,
+      },
+    });
+    const userData = response?.data?.usersPermissionsUsers[0];
+    setUserInfo(token, JSON.stringify(userData));
+    return userData;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -44,7 +51,7 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
     });
 
     if (!updatedUser) throw new Error("User update failed");
-    
+
     return JSON.parse(JSON.stringify(updatedUser));
   } catch (error) {
     handleError(error);
@@ -74,20 +81,25 @@ export async function deleteUser(clerkId: string) {
 }
 
 // USE CREDITS
-export async function updateCredits(userId: string, creditFee: number) {
+export async function updateCredits(
+  profileId: string,
+  creditFee: number,
+  email: string,
+  token: string
+) {
   try {
-    await connectToDatabase();
-
-    const updatedUserCredits = await User.findOneAndUpdate(
-      { _id: userId },
-      { $inc: { creditBalance: creditFee }},
-      { new: true }
-    )
-
-    if(!updatedUserCredits) throw new Error("User credits update failed");
-
-    return JSON.parse(JSON.stringify(updatedUserCredits));
+    const { data } = await apolloClient.mutate({
+      mutation: UpdateUserBalance,
+      variables: {
+        documentId: profileId,
+        data: {
+          creditBalances: creditFee,
+        },
+      },
+    });
+    await getUserById(email, token);
+    toast("successfully transformation");
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }

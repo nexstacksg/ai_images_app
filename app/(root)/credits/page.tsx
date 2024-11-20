@@ -1,4 +1,3 @@
-import { SignedIn, auth } from "@clerk/nextjs";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
@@ -9,11 +8,7 @@ import { getUserById } from "@/lib/actions/user.actions";
 import Checkout from "@/components/shared/Checkout";
 
 const Credits = async () => {
-  const { userId } = auth();
-
-  if (!userId) redirect("/sign-in");
-
-  const user = await getUserById(userId);
+  const user = { id: "than", creditBalances: 3000 };
 
   return (
     <>
@@ -55,7 +50,7 @@ const Credits = async () => {
                 ))}
               </ul>
 
-              {plan.name === "Free" ? (
+              {/* {plan.name === "Free" ? (
                 <Button variant="outline" className="credits-btn">
                   Free Consumable
                 </Button>
@@ -68,7 +63,7 @@ const Credits = async () => {
                     buyerId={user._id}
                   />
                 </SignedIn>
-              )}
+              )} */}
             </li>
           ))}
         </ul>
