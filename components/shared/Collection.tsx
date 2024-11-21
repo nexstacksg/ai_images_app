@@ -18,6 +18,7 @@ import { formUrlQuery } from "@/lib/utils";
 import { Button } from "../ui/button";
 
 import { Search } from "./Search";
+import { ImageData } from "@/types/image.types";
 
 export const Collection = ({
   hasSearch = false,
@@ -25,7 +26,7 @@ export const Collection = ({
   totalPages = 1,
   page,
 }: {
-  images: IImage[];
+  images: ImageData[];
   totalPages?: number;
   page: number;
   hasSearch?: boolean;
@@ -70,7 +71,7 @@ export const Collection = ({
           <PaginationContent className="flex w-full">
             <Button
               disabled={Number(page) <= 1}
-              className="collection-btn"
+              className="collection-btn max-w-32 max-h-12"
               onClick={() => onPageChange("prev")}
             >
               <PaginationPrevious className="hover:bg-transparent hover:text-white" />
@@ -81,7 +82,7 @@ export const Collection = ({
             </p>
 
             <Button
-              className="button w-32 bg-purple-gradient bg-cover text-white"
+              className="button max-w-32 max-h-12 bg-purple-gradient bg-cover text-white "
               onClick={() => onPageChange("next")}
               disabled={Number(page) >= totalPages}
             >
@@ -94,10 +95,13 @@ export const Collection = ({
   );
 };
 
-const Card = ({ image }: { image: IImage }) => {
+const Card = ({ image }: { image: ImageData }) => {
   return (
     <li>
-      <Link href={`/transformations/${image._id}`} className="collection-card">
+      <Link
+        href={`/transformations/${image.documentId}`}
+        className="collection-card"
+      >
         <CldImage
           src={image.publicId}
           alt={image.title}

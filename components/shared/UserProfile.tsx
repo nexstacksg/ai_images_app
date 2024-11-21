@@ -1,22 +1,25 @@
 "use client";
 import Image from "next/image";
 import Header from "@/components/shared/Header";
-import { getToken, getUserInfo } from "@/utils/auth";
-import { useEffect } from "react";
-import { getUserById } from "@/lib/actions/user.actions";
+import { getUserInfo } from "@/utils/auth";
+import { getImagesByProfile } from "@/lib/actions/image.services";
+import { useEffect, useState } from "react";
+import { ImageData } from "@/types/image.types";
+import { Collection } from "./Collection";
 
-const UserProfile = () => {
-  const token = getToken();
+const UserProfile = (props: { page: number }) => {
   const user = JSON.parse(getUserInfo() ?? "{}") ?? {};
+  const [images, setImages] = useState<ImageData[]>([]);
 
-  //   const fetchUserInfo = async () => {
-  //     await getUserById(user?.email, token);
-  //   };
-  //   useEffect(() => {
-  //     if (user) {
-  //       fetchUserInfo();
-  //     }
-  //   }, []);
+  const fetchImages = async () => {
+    const data = await getImagesByProfile(user?.profile?.documentId);
+    setImages(data);
+  };
+  useEffect(() => {
+    if (user) {
+      fetchImages();
+    }
+  }, []);
 
   return (
     <>
@@ -33,7 +36,7 @@ const UserProfile = () => {
               className="size-9 md:size-12"
             />
             <h2 className="h2-bold text-dark-600">
-              {user.profile.creditBalances}
+              {user.profile?.creditBalances ?? ""}
             </h2>
           </div>
         </div>
@@ -48,16 +51,19 @@ const UserProfile = () => {
               height={50}
               className="size-9 md:size-12"
             />
+            <h2 className="h2-bold text-dark-600">{images?.length}</h2>
           </div>
         </div>
       </section>
 
-      <section className="mt-8 md:mt-14">
-        {/* <Collection
-          images={images?.data}
-          totalPages={images?.totalPages}
-          page={page}
-        /> */}
+      <section className="sm:mt-12">
+        {images && (
+          <Collection
+            images={images ?? []}
+            totalPages={images?.length / 9}
+            page={props?.page}
+          />
+        )}
       </section>
     </>
   );

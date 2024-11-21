@@ -13,12 +13,37 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteImage } from "@/lib/actions/image.actions";
 
 import { Button } from "../ui/button";
+import { useMutation } from "@apollo/client";
+import { DELETE_IMAGE } from "@/graphql/mutation/images";
+import apolloClient from "@/lib/apolloClient";
+import { toast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export const DeleteConfirmation = ({ imageId }: { imageId: string }) => {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [deleteImageAction] = useMutation(DELETE_IMAGE, {
+    client: apolloClient,
+    onCompleted: (response) => {
+      toast({
+        title: "successfully deleted",
+        duration: 5000,
+        className: "success-toast",
+      });
+      router.back();
+    },
+    onError: (error) => {
+      console.log("error", error);
+    },
+  });
+
+  const deleteImage = async () => {
+    await deleteImageAction({
+      variables: { documentId: imageId },
+    });
+  };
 
   return (
     <AlertDialog>
@@ -43,14 +68,12 @@ export const DeleteConfirmation = ({ imageId }: { imageId: string }) => {
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="button h-[54px]">
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
-            className="border bg-red-500 text-white hover:bg-red-600"
-            onClick={() =>
-              startTransition(async () => {
-                await deleteImage(imageId);
-              })
-            }
+            className="border bg-red-500 text-white hover:bg-red-600 max-w-[100px]"
+            onClick={deleteImage}
           >
             {isPending ? "Deleting..." : "Delete"}
           </AlertDialogAction>

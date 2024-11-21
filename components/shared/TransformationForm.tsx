@@ -28,11 +28,14 @@ import MediaUploader from "./MediaUploader";
 import TransformedImage from "./TransformedImage";
 import { updateCredits } from "@/lib/actions/user.actions";
 import { getCldImageUrl } from "next-cloudinary";
-import { addImage, updateImage } from "@/lib/actions/image.actions";
 import { useRouter } from "next/navigation";
 import { InsufficientCreditsModal } from "./InsufficientCreditsModal";
 import { getToken, getUserInfo } from "@/utils/auth";
 import { log } from "console";
+import { useMutation } from "@apollo/client";
+import { CREATE_IMAGE, UPDATE_IMAGE } from "@/graphql/mutation/images";
+import apolloClient from "@/lib/apolloClient";
+import { toast } from "../ui/use-toast";
 
 export const formSchema = z.object({
   title: z.string(),
@@ -48,6 +51,8 @@ const TransformationForm = ({
   type,
   config = null,
 }: TransformationFormProps) => {
+  console.log(data);
+
   const router = useRouter();
   const user = JSON.parse(getUserInfo() ?? "{}") ?? {};
   const token = getToken();
@@ -59,6 +64,44 @@ const TransformationForm = ({
   const [isTransforming, setIsTransforming] = useState(false);
   const [transformationConfig, setTransformationConfig] = useState(config);
   const [isPending, startTransition] = useTransition();
+
+  const [createImageAction] = useMutation(CREATE_IMAGE, {
+    client: apolloClient,
+    onCompleted: (response) => {
+      if (response) {
+        form.reset();
+        toast({
+          title: "successfully saved",
+          duration: 5000,
+          className: "success-toast",
+        });
+        setImage(data);
+        router.push(`/transformations/${response?.createImage?.documentId}`);
+      }
+    },
+    onError: (error) => {
+      console.log("error", error);
+    },
+  });
+
+  const [updateImageAction] = useMutation(UPDATE_IMAGE, {
+    client: apolloClient,
+    onCompleted: (response) => {
+      if (response) {
+        form.reset();
+        setImage(data);
+        toast({
+          title: "successfully updated",
+          duration: 5000,
+          className: "success-toast",
+        });
+        router.push(`/transformations/${response?.updateImage?.documentId}`);
+      }
+    },
+    onError: (error) => {
+      console.log("error", error);
+    },
+  });
 
   const initialValues =
     data && action === "Update"
@@ -105,22 +148,15 @@ const TransformationForm = ({
       };
 
       if (action === "Add") {
-        console.log("add");
-        console.log(imageData);
-
-        try {
-          const newImage = await addImage(imageData);
-          if (newImage) {
-            form.reset();
-            setImage(data);
-            router.push(`/transformations/${newImage.documentId}`);
-          }
-        } catch (error) {
-          console.log(error);
-        }
+        await createImageAction({
+          variables: { data: imageData },
+        });
       }
 
       if (action === "Update") {
+        await updateImageAction({
+          variables: { documentId: data?.documentId, data: imageData },
+        });
         // try {
         //   const updatedImage = await updateImage({
         //     image: {
@@ -199,7 +235,7 @@ const TransformationForm = ({
     if (image && (type === "restore" || type === "removeBackground")) {
       setNewTransformation(transformationType.config);
     }
-  }, [image, transformationType.config, type]);
+  }, [image, transformationType?.config, type]);
 
   return (
     <Form {...form}>
