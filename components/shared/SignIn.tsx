@@ -13,7 +13,7 @@ import { LOGIN } from "@/graphql/mutation/auth";
 import apolloClient from "@/lib/apolloClient";
 import { setToken } from "@/utils/auth";
 import { getUserById } from "@/lib/actions/user.actions";
-import { toast } from "sonner";
+import { toast } from "../ui/use-toast";
 
 const SignIn = () => {
   const router = useRouter();
@@ -25,13 +25,24 @@ const SignIn = () => {
     client: apolloClient,
     onCompleted: (response: TokenData) => {
       setToken(response?.login?.jwt);
-      toast("Login Successful");
+      toast({
+        title: "Successfully Login",
+        description: "Welcome to Imaginify",
+        duration: 5000,
+        className: "success-toast",
+      });
       setTimeout(async () => {
         await getUserById(response?.login?.user.email, response?.login?.jwt);
         router.replace("/home");
       }, 2000);
     },
     onError: (error) => {
+      toast({
+        title: "Failed",
+        description: error?.message ?? "Invalid Credential",
+        duration: 5000,
+        className: "error-toast",
+      });
       console.log("error", error);
     },
   });
@@ -67,12 +78,12 @@ const SignIn = () => {
                     name="identifier"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Login ID</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             className=""
-                            placeholder="Enter your login ID"
+                            placeholder="Enter your email"
                           />
                         </FormControl>
                       </FormItem>
