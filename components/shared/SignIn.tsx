@@ -14,6 +14,7 @@ import apolloClient from "@/lib/apolloClient";
 import { setToken } from "@/utils/auth";
 import { getUserById } from "@/lib/actions/user.actions";
 import { toast } from "../ui/use-toast";
+import Image from "next/image";
 
 const SignIn = () => {
   const router = useRouter();
@@ -61,10 +62,16 @@ const SignIn = () => {
             direction="column"
             align="center"
             justify="center"
-            className="p-4 w-[420px] space-y-4"
+            className="p-4 pt-8 w-[420px] space-y-4"
           >
             <Box className="text-center pt-4">
-              <div className="text-[20px] font-semibold">Welcome Back</div>
+              <Image
+                src="/assets/images/logo-text.svg"
+                alt="logo"
+                width={260}
+                height={54}
+              />
+              <div className="text-[20px] font-semibold pt-4">Welcome Back</div>
               <div className="text-[16px] ">Please log in to continue</div>
             </Box>
             <Form {...form}>

@@ -31,7 +31,7 @@ export const navLinks = [
   },
   {
     label: "Profile",
-    route: "user-profile",
+    route: "/user-profile",
     icon: "/assets/icons/profile.svg",
   },
   {
