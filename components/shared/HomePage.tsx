@@ -45,7 +45,7 @@ const HomePage = (props: { page: number }) => {
         {images && (
           <Collection
             images={images ?? []}
-            totalPages={images?.length / 2}
+            totalPages={images?.length / 18}
             page={props?.page}
           />
         )}

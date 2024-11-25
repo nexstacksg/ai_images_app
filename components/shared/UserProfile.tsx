@@ -76,7 +76,7 @@ const UserProfile = (props: { page: number }) => {
         {images && (
           <Collection
             images={images ?? []}
-            totalPages={images?.length / 9}
+            totalPages={images?.length / 18}
             page={props?.page}
           />
         )}

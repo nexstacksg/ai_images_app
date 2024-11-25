@@ -1,7 +1,6 @@
-"use client"; // Error components must be Client Components
+"use client";
 
 import { useEffect } from "react";
-
 import { Flex } from "@radix-ui/themes";
 import Image from "next/image";
 
