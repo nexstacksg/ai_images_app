@@ -4,20 +4,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { Collection } from "./Collection";
 import { useEffect, useState } from "react";
-import { getAllImages } from "@/lib/actions/image.services";
+import { getImagesByProfile } from "@/lib/actions/image.services";
 import { ImageData } from "@/types/image.types";
+import { getUserInfo } from "@/utils/auth";
 
 const HomePage = (props: { page: number }) => {
+  const user = JSON.parse(getUserInfo() ?? "{}") ?? {};
   const [images, setImages] = useState<ImageData[]>();
 
   const fetchImage = async () => {
-    const data = await getAllImages();
+    const data = await getImagesByProfile(user?.profile?.documentId);
     setImages(data);
   };
 
   useEffect(() => {
-    fetchImage();
-  }, [props?.page]);
+    if (user) {
+      fetchImage();
+    }
+  }, [user]);
 
   return (
     <>
