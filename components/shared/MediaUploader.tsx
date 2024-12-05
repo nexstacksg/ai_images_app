@@ -5,6 +5,8 @@ import { dataUrl, getImageSize } from "@/lib/utils";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
 import { PlaceholderValue } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
+import { Button } from "../ui/button";
+import { useState } from "react";
 
 type MediaUploaderProps = {
   onValueChange: (value: string) => void;
@@ -33,13 +35,6 @@ const MediaUploader = ({
     }));
 
     onValueChange(result?.info?.public_id);
-
-    toast({
-      title: "Image uploaded successfully",
-      description: "1 credit was deducted from your account",
-      duration: 5000,
-      className: "success-toast",
-    });
   };
 
   const onUploadErrorHandler = () => {
@@ -67,7 +62,10 @@ const MediaUploader = ({
 
           {publicId ? (
             <>
-              <div className="cursor-pointer overflow-hidden rounded-[10px]">
+              <div
+                className="cursor-pointer overflow-hidden rounded-[10px]"
+                onClick={() => open()}
+              >
                 <CldImage
                   width={getImageSize(type, image, "width")}
                   height={getImageSize(type, image, "height")}

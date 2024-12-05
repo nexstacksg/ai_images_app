@@ -5,10 +5,9 @@ import { connectToDatabase } from "../database/mongoose";
 import { handleError } from "../utils";
 import apolloClient from "../apolloClient";
 import { GET_ME } from "@/graphql/queries/me";
-import { MeData } from "@/types/auth.types";
 import { setUserInfo } from "@/utils/auth";
-import { toast } from "sonner";
 import { UpdateUserBalance } from "@/graphql/mutation/user";
+import { toast } from "@/components/ui/use-toast";
 
 // CREATE
 export async function createUser(user: CreateUserParams) {
@@ -98,7 +97,12 @@ export async function updateCredits(
       },
     });
     await getUserById(email, token);
-    toast("successfully transformation");
+    toast({
+      title: "Image uploaded successfully",
+      description: "1 credit was deducted from your account",
+      duration: 5000,
+      className: "success-toast",
+    });
   } catch (error) {
     console.log(error);
   }

@@ -51,8 +51,6 @@ const TransformationForm = ({
   type,
   config = null,
 }: TransformationFormProps) => {
-  console.log(data);
-
   const router = useRouter();
   const user = JSON.parse(getUserInfo() ?? "{}") ?? {};
   const token = getToken();
@@ -220,7 +218,6 @@ const TransformationForm = ({
     setTransformationConfig(
       deepMergeObjects(newTransformation, transformationConfig)
     );
-    setNewTransformation(null);
     startTransition(async () => {
       await updateCredits(
         user?.profile?.documentId,
@@ -229,6 +226,9 @@ const TransformationForm = ({
         token
       );
     });
+    setTimeout(() => {
+      setIsTransforming(false);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -239,10 +239,35 @@ const TransformationForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
         {user.creditBalances < Math.abs(creditFee) && (
           <InsufficientCreditsModal />
         )}
+        <div className="media-uploader-field">
+          <CustomField
+            control={form.control}
+            name="publicId"
+            className="flex size-full flex-col"
+            render={({ field }) => (
+              <MediaUploader
+                onValueChange={field.onChange}
+                setImage={setImage}
+                publicId={field.value}
+                image={image}
+                type={type}
+              />
+            )}
+          />
+
+          <TransformedImage
+            image={image}
+            type={type}
+            title={form.getValues().title}
+            isTransforming={isTransforming}
+            setIsTransforming={setIsTransforming}
+            transformationConfig={transformationConfig}
+          />
+        </div>
         <CustomField
           control={form.control}
           name="title"
@@ -250,7 +275,6 @@ const TransformationForm = ({
           className="w-full"
           render={({ field }) => <Input {...field} className="input-field" />}
         />
-
         {type === "fill" && (
           <CustomField
             control={form.control}
@@ -328,32 +352,6 @@ const TransformationForm = ({
             )}
           </div>
         )}
-
-        <div className="media-uploader-field">
-          <CustomField
-            control={form.control}
-            name="publicId"
-            className="flex size-full flex-col"
-            render={({ field }) => (
-              <MediaUploader
-                onValueChange={field.onChange}
-                setImage={setImage}
-                publicId={field.value}
-                image={image}
-                type={type}
-              />
-            )}
-          />
-
-          <TransformedImage
-            image={image}
-            type={type}
-            title={form.getValues().title}
-            isTransforming={isTransforming}
-            setIsTransforming={setIsTransforming}
-            transformationConfig={transformationConfig}
-          />
-        </div>
 
         <div className="flex flex-col gap-4">
           <Button

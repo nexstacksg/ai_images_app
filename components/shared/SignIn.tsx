@@ -24,7 +24,7 @@ const SignIn = () => {
 
   const [loginAction] = useMutation(LOGIN, {
     client: apolloClient,
-    onCompleted: (response: TokenData) => {
+    onCompleted: async (response: TokenData) => {
       setToken(response?.login?.jwt);
       toast({
         title: "Successfully Login",
@@ -32,10 +32,8 @@ const SignIn = () => {
         duration: 5000,
         className: "success-toast",
       });
-      setTimeout(async () => {
-        await getUserById(response?.login?.user.email, response?.login?.jwt);
-        router.replace("/home");
-      }, 2000);
+      await getUserById(response?.login?.user.email, response?.login?.jwt);
+      router.replace("/home");
     },
     onError: (error) => {
       toast({
