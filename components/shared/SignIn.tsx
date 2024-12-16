@@ -69,7 +69,7 @@ const SignIn = () => {
                 width={260}
                 height={54}
               />
-              <div className="text-[20px] font-semibold pt-4">Welcome Back</div>
+              <div className="text-[20px] font-semibold pt-4">Welcome</div>
               <div className="text-[16px] ">Please log in to continue</div>
             </Box>
             <Form {...form}>

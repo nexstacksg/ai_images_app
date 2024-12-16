@@ -36,6 +36,7 @@ import { useMutation } from "@apollo/client";
 import { CREATE_IMAGE, UPDATE_IMAGE } from "@/graphql/mutation/images";
 import apolloClient from "@/lib/apolloClient";
 import { toast } from "../ui/use-toast";
+import { title } from "process";
 
 export const formSchema = z.object({
   title: z.string(),
@@ -155,21 +156,6 @@ const TransformationForm = ({
         await updateImageAction({
           variables: { documentId: data?.documentId, data: imageData },
         });
-        // try {
-        //   const updatedImage = await updateImage({
-        //     image: {
-        //       ...imageData,
-        //       _id: data._id,
-        //     },
-        //     userId: user?.documentId,
-        //     path: `/transformations/${data._id}`,
-        //   });
-        //   if (updatedImage) {
-        //     router.push(`/transformations/${updatedImage._id}`);
-        //   }
-        // } catch (error) {
-        //   console.log(error);
-        // }
       }
     }
 
@@ -251,7 +237,10 @@ const TransformationForm = ({
             render={({ field }) => (
               <MediaUploader
                 onValueChange={field.onChange}
-                setImage={setImage}
+                setImage={(e) => {
+                  setImage(e);
+                  setTransformationConfig(null);
+                }}
                 publicId={field.value}
                 image={image}
                 type={type}
@@ -365,7 +354,7 @@ const TransformationForm = ({
           <Button
             type="submit"
             className="submit-button capitalize"
-            disabled={isSubmitting}
+            disabled={isSubmitting || form.watch("title") === ""}
           >
             {isSubmitting ? "Submitting..." : "Save Image"}
           </Button>
